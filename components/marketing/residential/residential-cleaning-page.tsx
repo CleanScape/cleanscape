@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import { Check, Star } from "lucide-react";
 
+import { LANDING_NAV_BLOCK } from "@/components/marketing/landing/nav-metrics";
 import { ReviewsSection } from "@/components/marketing/landing/reviews-section";
 import {
   FlexibleIcon,
@@ -77,13 +78,7 @@ const SERVICE_CARDS = [
   {
     href: "/booking/new?service=airbnb_turnover",
     image: "/images/marketing/landing/str-airbnb.png",
-    label: "Airbnb Cleaning",
-    objectPosition: "object-center",
-  },
-  {
-    href: "/booking/new?service=holiday_let",
-    image: "/images/marketing/landing/str-holiday.png",
-    label: "Shortlet Cleaning",
+    label: "Airbnb/Shortlet Cleaning",
     objectPosition: "object-center",
   },
 ] as const;
@@ -115,12 +110,8 @@ const FAQS = [
         name: "End of tenancy cleaning",
       },
       {
-        description: "Guest-ready turnover cleans between Airbnb stays.",
-        name: "Airbnb cleaning",
-      },
-      {
-        description: "Shortlet cleans with guest-ready presentation.",
-        name: "Shortlet cleaning",
+        description: "Guest-ready turnover cleans between Airbnb and shortlet stays.",
+        name: "Airbnb/Shortlet cleaning",
       },
     ],
     servicesHeading: "What residential cleaning services does Mundoria offer?",
@@ -153,7 +144,10 @@ export function ResidentialCleaningPage({
 
   return (
     <>
-      <section className="relative isolate overflow-hidden">
+      <section
+        className="relative isolate overflow-hidden"
+        style={{ marginTop: `calc(-1 * ${LANDING_NAV_BLOCK})` }}
+      >
         <div className="absolute inset-0">
           <Image
             alt=""
@@ -170,7 +164,10 @@ export function ResidentialCleaningPage({
           />
         </div>
 
-        <div className="relative mx-auto flex min-h-[22rem] w-full max-w-[1400px] flex-col justify-between px-4 py-8 sm:min-h-[26rem] sm:px-8 sm:py-10 lg:min-h-[28rem] lg:px-12 lg:py-12">
+        <div
+          className="relative mx-auto flex min-h-[22rem] w-full max-w-[1400px] flex-col justify-between px-4 pb-8 sm:min-h-[26rem] sm:px-8 sm:pb-10 lg:min-h-[28rem] lg:px-12 lg:pb-12"
+          style={{ paddingTop: `calc(${LANDING_NAV_BLOCK} + 1.25rem)` }}
+        >
           <div className="flex justify-end">
             <a
               className="inline-flex items-center gap-1.5 text-[12px] font-medium text-white/95 transition hover:text-white sm:text-[13px]"

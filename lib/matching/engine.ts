@@ -211,15 +211,24 @@ export async function runMatchingEngine(
   );
 
   if (Number(booking.allocated_cleaners ?? 1) > 1) {
-    await alertAdmins(
-      "multi_cleaner_job",
-      "Multi-cleaner office job matched",
-      `Booking ${bookingId.slice(0, 8)} needs ${booking.allocated_cleaners} cleaners. Primary matched; assign remaining team.`,
-      {
-        allocated_cleaners: booking.allocated_cleaners,
-        booking_id: bookingId,
-      },
-    );
+    const { offerTeamSlots } = await import("@/lib/matching/team");
+    const allocated = Number(booking.allocated_cleaners);
+    const share = Math.floor(Number(booking.amount_cleaner ?? 0) / allocated);
+    await offerTeamSlots({
+      allocatedCleaners: allocated,
+      bookingId,
+      primaryCleanerId: winner.cleanerId,
+      rankedCleanerIds: ranked.map((candidate) => candidate.cleanerId),
+      sharePence: share,
+    });
+  }
+
+  if (booking.prefer_same_cleaner) {
+    await admin
+      .from("bookings")
+      .update({ preferred_cleaner_id: winner.cleanerId })
+      .eq("parent_booking_id", bookingId)
+      .neq("status", "cancelled");
   }
 
   await admin.from("cleaner_job_responses").upsert(

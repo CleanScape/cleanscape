@@ -4,16 +4,34 @@ import { notFound } from "next/navigation";
 
 import { JsonLd } from "@/components/marketing/json-ld";
 import {
+  BrandedCardLink,
+  BrandedCtaBand,
+  BrandedPageWash,
+  BrandedSection,
+} from "@/components/marketing/branded-page-sections";
+import {
+  LocationFaqBlock,
+  LocationFeaturedCleaners,
+  LocationHowToBook,
+  LocationReviews,
+  LocationServicesExplainer,
+  LocationTrustStrip,
+  LocationWhatsCovered,
+} from "@/components/marketing/location-seo-sections";
+import {
   MarketingHero,
   MarketingShell,
 } from "@/components/marketing/marketing-shell";
-import { Button } from "@/components/ui/button";
 import {
   BIRMINGHAM_AREAS,
   LAUNCH_CITY,
   birminghamAreaBySlug,
   popularMarketingServices,
 } from "@/lib/seo/marketing";
+import {
+  BIRMINGHAM_LOCATION_CLEANERS,
+  BIRMINGHAM_LOCATION_REVIEWS,
+} from "@/lib/seo/location-social-proof";
 import { absoluteUrl, buildPageMetadata } from "@/lib/seo/site";
 import { hasSupabasePublicConfig } from "@/lib/supabase/config";
 
@@ -43,6 +61,14 @@ export default function BirminghamAreaPage({ params }: PageProps) {
   const bookingHref = configured ? "/booking/new" : "/setup";
   const popular = popularMarketingServices(4);
   const otherAreas = BIRMINGHAM_AREAS.filter((item) => item.slug !== area.slug);
+  const place = `${area.name}, Birmingham`;
+  const localCleaners = BIRMINGHAM_LOCATION_CLEANERS.filter((cleaner) =>
+    cleaner.areas.toLowerCase().includes(area.name.split(" ")[0]!.toLowerCase()),
+  );
+  const featured =
+    localCleaners.length >= 3
+      ? localCleaners
+      : BIRMINGHAM_LOCATION_CLEANERS.slice(0, 6);
 
   return (
     <MarketingShell>
@@ -77,7 +103,7 @@ export default function BirminghamAreaPage({ params }: PageProps) {
             "@type": "Service",
             areaServed: {
               "@type": "Place",
-              name: `${area.name}, Birmingham`,
+              name: place,
             },
             description: area.description,
             name: `Cleaning services in ${area.name}`,
@@ -91,56 +117,60 @@ export default function BirminghamAreaPage({ params }: PageProps) {
         ]}
       />
 
-      <MarketingHero
-        description={area.description}
-        eyebrow={`${area.name} · Birmingham`}
-        primaryHref={bookingHref}
-        primaryLabel={`Book in ${area.name}`}
-        secondaryHref={`/cleaners/${LAUNCH_CITY.slug}`}
-        secondaryLabel="All Birmingham areas"
-        title={`Cleaners in ${area.name}`}
-      />
+      <BrandedPageWash>
+        <MarketingHero
+          description={`One-off or regular house cleaning in ${area.name}. Tried & vetted cleaners nearby — clear estimates before you book.`}
+          eyebrow={`${area.name} · Birmingham`}
+          primaryHref={bookingHref}
+          primaryLabel={`Book in ${area.name}`}
+          secondaryHref={`/cleaners/${LAUNCH_CITY.slug}`}
+          secondaryLabel="All Birmingham areas"
+          title={`Cleaners in ${area.name}`}
+        />
 
-      <section className="px-5 py-16 sm:px-8">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="text-3xl font-black tracking-[-0.04em] text-foreground">
-            Services customers book in {area.name}
+        <LocationTrustStrip />
+
+        <LocationFeaturedCleaners cleaners={[...featured]} place={area.name} />
+
+        <BrandedSection>
+          <h2 className="text-[1.5rem] font-semibold tracking-[-0.03em] text-[#1c133b] sm:text-2xl">
+            Looking for something different in cleaning?
           </h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {popular.map((service) => (
-              <Link
-                className="rounded-2xl border border-border bg-card p-6 transition hover:border-primary/40"
+              <BrandedCardLink
+                description={service.description}
                 href={`/cleaning/${service.slug}`}
                 key={service.slug}
-              >
-                <h3 className="text-lg font-black text-foreground">
-                  {service.label}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {service.description}
-                </p>
-              </Link>
+                label={service.label}
+                meta={service.categoryLabel}
+              />
             ))}
           </div>
-          <Button
-            asChild
-            className="mt-8 h-12 rounded-full bg-foreground px-6 font-black text-background hover:bg-foreground/90"
-          >
-            <Link href={bookingHref}>Check availability</Link>
-          </Button>
-        </div>
-      </section>
+        </BrandedSection>
 
-      <section className="border-t border-border bg-muted/30 px-5 py-16 sm:px-8">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="text-2xl font-black text-foreground">
-            Nearby Birmingham areas
+        <LocationReviews
+          place={area.name}
+          reviews={[...BIRMINGHAM_LOCATION_REVIEWS]}
+        />
+
+        <LocationServicesExplainer place={place} />
+        <LocationWhatsCovered place={place} />
+        <LocationHowToBook place={place} />
+        <LocationFaqBlock place={place} />
+
+        <BrandedSection tone="lavender">
+          <h2 className="text-[1.35rem] font-semibold tracking-[-0.03em] text-[#1c133b] sm:text-xl">
+            Domestic cleaners near {area.name}
           </h2>
+          <p className="mt-2 text-sm text-[#5a5470]">
+            Mundoria pros are available in these towns and their surroundings:
+          </p>
           <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {otherAreas.map((item) => (
               <li key={item.slug}>
                 <Link
-                  className="block rounded-xl border border-border bg-card px-4 py-4 text-sm font-bold text-foreground transition hover:border-primary/40"
+                  className="block rounded-[1.15rem] border border-[#e4daf5]/80 bg-white/85 px-4 py-4 text-sm font-semibold text-[#1c133b] shadow-[0_8px_22px_rgba(49,44,121,0.05)] transition hover:-translate-y-0.5 hover:text-[#6a45b8]"
                   href={`/cleaners/${LAUNCH_CITY.slug}/${item.slug}`}
                 >
                   {item.name}
@@ -148,8 +178,15 @@ export default function BirminghamAreaPage({ params }: PageProps) {
               </li>
             ))}
           </ul>
-        </div>
-      </section>
+        </BrandedSection>
+
+        <BrandedCtaBand
+          body={`Book cleaning in ${area.name} with a clear estimate and live status.`}
+          href={bookingHref}
+          label={`Book in ${area.name}`}
+          title={`Need a cleaner in ${area.name}?`}
+        />
+      </BrandedPageWash>
     </MarketingShell>
   );
 }
